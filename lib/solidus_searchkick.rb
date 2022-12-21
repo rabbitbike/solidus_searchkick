@@ -6,8 +6,6 @@ require 'solidus_support'
 
 require 'solidus_searchkick/version'
 require 'solidus_searchkick/engine'
-require 'solidus_searchkick/railtie' if defined?(Rails)
-
 module SolidusSearchkick
   def self.root
     File.expand_path('../..',__FILE__)
