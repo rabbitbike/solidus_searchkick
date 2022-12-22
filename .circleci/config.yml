@@ -5,7 +5,7 @@ orbs:
   # run specs against Solidus supported versions only without the need
   # to change this configuration every time a Solidus version is released
   # or goes EOL.
-  solidusio_extensions: solidusio/extensions@volatile
+  solidusio_extensions: solidusio/extensions@dev:5d7d86e2c939fef58fe36fe6b45d9d4ca0b43d5b
 
 jobs:
   run-specs-with-postgres:
