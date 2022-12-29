@@ -84,6 +84,7 @@ module Spree::Search
     def add_search_filters(search)
       filters = @properties[:filters]
       return search unless filters
+      taxon = @properties[:taxon]
       all_filters = taxon ? taxon.applicable_filters : Spree::Core::SearchkickFilters.all_filters
 
       applicable_filters = {}
