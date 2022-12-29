@@ -26,6 +26,7 @@ module Spree::Search
 
     def get_base_search
       # If a query is passed in, then we are only using the ElasticSearch DSL and don't care about any other options
+      query = @properties[:query]
       if query
         Spree::Product.search(query: query)
       else
@@ -33,15 +34,17 @@ module Spree::Search
           # Set execute to false in case we need to modify the search before it is executed
           execute: false,
 
-          where:    where_clause,
-          page:     page,
-          per_page: per_page,
+          where: where_clause,
+          page: @properties[:page],
+          per_page: @properties[:per_page],
         }
 
+        fields = @properties[:fields]
         search_options.merge!(fields: fields) if fields
-        search_options.merge!(searchkick_options)
+        search_options.merge!(@properties[:searchkick_options])
         search_options.deep_merge!(includes: includes_clause)
 
+        keywords = @properties[:keywords]
         keywords_clause = (keywords.nil? || keywords.empty?) ? '*' : keywords
         search = Spree::Product.search(keywords_clause, search_options)
 
@@ -61,13 +64,15 @@ module Spree::Search
         currency: pricing_options.currency,
         price: { not: nil }
       }
-      where_clause.merge!({taxon_ids: taxon.id}) if taxon
+      taxon = @properties[:taxon]
+      where_clause.merge!({ taxon_ids: taxon.id }) if taxon
 
       # Add search attributes from params[:search]
       add_search_attributes(where_clause)
     end
 
     def add_search_attributes(query)
+      search = @properties[:search]
       return query unless search
       search.each do |name, scope_attribute|
         query.merge!(Hash[name, scope_attribute])
@@ -77,6 +82,7 @@ module Spree::Search
     end
 
     def add_search_filters(search)
+      filters = @properties[:filters]
       return search unless filters
       all_filters = taxon ? taxon.applicable_filters : Spree::Core::SearchkickFilters.all_filters
 
@@ -120,8 +126,8 @@ module Spree::Search
     end
 
     def includes_clause
-      includes_clause =  { master: [:currently_valid_prices] }
-      includes_clause[:master] << :images if include_images
+      includes_clause = { master: [:prices] }
+      includes_clause[:master] << :images if @properties[:include_images]
       includes_clause
     end
 
